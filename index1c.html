@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Learning Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #E6F3FF;
+        }
+        nav {
+            background-color: #4180dd;
+            padding: 10px;
+            text-align: center;
+        }
+        .nav-button {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 0 5px;
+            background-color: #4180dd;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .top-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background-color: #FFFACD;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .enlarged-text {
+            font-size: 48px; /* Increased font size */
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .control-button {
+            padding: 15px 20px;
+            margin: 0 5px;
+            font-size: 14px;
+            background-color: #90EE90;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #play-btn,
+        #slow-play-btn,
+        #record-btn,
+        #sentence-play-btn,
+        #sentence-slow-play-btn {
+            background-color: #4180dd;
+            color: white;
+        }
+        .bottom-section {
+            flex: 2;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px; /* Reduced font size for table */
+        }
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        tr.active {
+            background-color: #f0f0f0;
+        }
+        .select-btn,
+        .toggle-btn {
+            padding: 5px 10px;
+            margin: 0 2px;
+            background-color: #4180dd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .toggle-btn {
+            background-color: #FFA07A;
+        }
+        .menu-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+        .menu-btn,
+        .home-btn,
+        .refresh-btn {
+            width: 60px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #4180dd;
+            color: white;
+            font-size: 16px;
+            border: none;
+            margin: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .menu-btn:hover,
+        .home-btn:hover,
+        .refresh-btn:hover {
+            background-color: #388E3C;
+        }
+        /* Styles for individual text elements */
+        #french-text { margin-bottom: 5px; }
+        #phonetic-text { margin-bottom: 5px; }
+        #chinese-text { margin-bottom: 5px; }
+        #sentence-text { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="menu-bar" id="menuBar">
+       <button class="home-btn" onclick="window.location.href='index.html'">使用说明</button>
+
+    </div>
+    <div class="top-section">
+        <div class="enlarged-text">
+            <div id="french-text"></div>
+            <div id="phonetic-text"></div>
+            <div id="chinese-text"></div>
+            <div id="sentence-text"></div> <!-- Added sentence display -->
+        </div>
+        <div class="controls">
+            <button id="prev-btn" class="control-button">上一句</button>
+            <button id="play-btn" class="control-button">单词读音</button>
+            <button id="slow-play-btn" class="control-button">单词慢读</button>
+            <button id="record-btn" class="control-button">录音</button>
+             <button id="sentence-play-btn" class="control-button">句子读音</button>
+            <button id="sentence-slow-play-btn" class="control-button">句子慢读</button>
+            <button id="next-btn" class="control-button">下一句</button>
+        </div>
+    </div>
+    <div class="bottom-section">
+        <table id="data-table">
+            <tr>
+                <th>French</th>
+                <th>Chinese</th>
+                <th>Phonetic</th>
+                <th>Sentence</th> <!-- Added sentence header -->
+                <th>选择</th>
+                <th>隐藏/显示</th>
+            </tr>
+        </table>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuBar = document.getElementById("menuBar");
+            // Home Button (Added before the letter buttons)
+            // Letter Buttons (A-Z)
+            for (let i = 65; i <= 90; i++) {
+                let letter = String.fromCharCode(i);
+                let btn = document.createElement("button");
+                btn.textContent = letter;
+                btn.className = "menu-btn";
+                btn.onclick = function () {
+                    loadData(letter);
+                };
+                menuBar.appendChild(btn);
+            }
+            // Refresh Button (Added after the letter buttons)
+            const refreshBtn = document.createElement("button");
+            refreshBtn.className = "refresh-btn";
+            refreshBtn.textContent = "刷新";
+            refreshBtn.onclick = function () {
+                window.location.reload();
+            };
+            menuBar.appendChild(refreshBtn);
+            let currentScript = null;
+            function loadData(letter) {
+                let fileName = `${letter.toLowerCase()}.js`;
+                if (currentScript) {
+                    document.body.removeChild(currentScript);
+                }
+                currentScript = document.createElement("script");
+                currentScript.src = fileName;
+                currentScript.onload = function () {
+                    console.log(`✅ ${fileName} 数据文件已加载`);
+                    renderTable();
+                };
+                currentScript.onerror = function () {
+                    console.error(`❌ 无法加载 ${fileName}`);
+                    // 如果加载失败，使用默认数据
+                    data = [
+                        ["Data not available", "数据不可用", "", ""]
+                    ];
+                    renderTable();
+                };
+                document.body.appendChild(currentScript);
+            }
+
+
+			function renderTable() {
+				let visibility = Array(data.length).fill(true);
+                let currentIndex = 0;
+
+                const tableBody = document.getElementById('data-table');
+                tableBody.innerHTML = `
+                    <tr>
+                        <th>French</th>
+                        <th>Chinese</th>
+                        <th>Phonetic</th>
+                        <th>Sentence</th>
+                        <th>选择</th>
+                        <th>隐藏/显示</th>
+                    </tr>
+                `;
+
+                data.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    row.forEach(cell => {
+                        const td = document.createElement('td');
+                        td.textContent = cell;
+                        tr.appendChild(td);
+                    });
+
+                    // Select Button
+                    const selectTd = document.createElement('td');
+                    const selectBtn = document.createElement('button');
+                    selectBtn.textContent = '选择';
+                    selectBtn.className = 'select-btn';
+                    selectBtn.addEventListener('click', () => {
+                        currentIndex = index;
+                        updateDisplay();
+                        autoPlayAudio();
+                    });
+                    selectTd.appendChild(selectBtn);
+                    tr.appendChild(selectTd);
+
+                    // Toggle Button
+                    const toggleTd = document.createElement('td');
+                    const toggleBtn = document.createElement('button');
+                    toggleBtn.textContent = '✔';
+                    toggleBtn.className = 'toggle-btn';
+                    toggleBtn.addEventListener('click', () => {
+						if (index === 0) {
+							// 如果点击的是第一行的按钮
+							visibility.fill(false); // 将所有行的 visibility 设置为 false
+							document.querySelectorAll('.toggle-btn').forEach(btn => btn.textContent = '✘'); // 将所有按钮的文本设置为 '✘'
+							updateDisplay(); // 更新显示
+						} else {
+							// 如果点击的不是第一行的按钮
+							visibility[index] = !visibility[index]; // 切换当前行的 visibility
+							toggleBtn.textContent = visibility[index] ? '✔' : '✘'; // 更新当前按钮的文本
+							updateDisplay(); // 更新显示
+						}
+                    });
+                    toggleTd.appendChild(toggleBtn);
+                    tr.appendChild(toggleTd);
+
+                    tableBody.appendChild(tr);
+                });
+
+                updateDisplay();
+
+                function updateDisplay() {
+                    if (data && data.length > 0) {
+                        if (visibility[currentIndex]) {
+                            document.getElementById('french-text').textContent = data[currentIndex][0] || '';
+                            document.getElementById('chinese-text').textContent = data[currentIndex][1] || '';
+                            document.getElementById('phonetic-text').textContent = data[currentIndex][2] || '';
+                            document.getElementById('sentence-text').textContent = data[currentIndex][3] || '';
+                        } else {
+                            navigateNextVisible(1);
+                        }
+
+                        const rows = document.querySelectorAll('#data-table tr');
+                        rows.forEach((row, index) => {
+                            const toggleBtn = row.querySelector('.toggle-btn');
+                            if (toggleBtn) {
+                                toggleBtn.textContent = visibility[index - 1] ? '✔' : '✘';
+                            }
+
+                            if (index === currentIndex + 1) {
+                                row.classList.add('active');
+                            } else {
+                                row.classList.remove('active');
+                            }
+                        });
+                    }
+                }
+
+                function autoPlayAudio() {
+                    setTimeout(() => {
+                        document.getElementById('play-btn').click();
+                    }, 1000);
+                }
+
+                function navigateNextVisible(direction) {
+                    let startIndex = currentIndex;
+                    do {
+                        currentIndex += direction;
+                        if (currentIndex < 0) currentIndex = data.length - 1;
+                        if (currentIndex >= data.length) currentIndex = 0;
+                    } while (!visibility[currentIndex] && currentIndex !== startIndex);
+                    updateDisplay();
+                    autoPlayAudio();
+                }
+
+                // Attach event listeners to the main buttons (prev, next)
+                document.getElementById('prev-btn').addEventListener('click', () => navigateNextVisible(-1));
+                document.getElementById('next-btn').addEventListener('click', () => navigateNextVisible(1));
+            }
+
+
+
+
+
+            let synth = window.speechSynthesis;
+            let mediaRecorder;
+            let audioChunks = [];
+            let stream1;
+            let stream;
+            // 在页面加载时请求麦克风权限并保持流开启
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(s => {
+                    stream = s;
+                    console.log("Microphone is now ready to use");
+                    // 保持音频轨道开启
+                    stream.getAudioTracks().forEach(track => {
+                        track.enabled = true;
+                    });
+                })
+                .catch(error => {
+                    console.error("Error accessing microphone:", error);
+                });
+            // 文本预处理函数
+            function preprocessText(text) {
+                // 移除省略号
+                text = text.replace("...", "");
+                // 可以添加更多预处理规则
+                return text;
+            }
+
+            function speak(text, rate = 1) {
+                if (synth.speaking) synth.cancel();
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR';
+                utterance.rate = rate;
+                synth.speak(utterance);
+            }
+            document.getElementById('play-btn').addEventListener('click', () => {
+                const frenchText = document.getElementById('french-text').textContent;
+                const preprocessedText = preprocessText(frenchText);
+                speak(preprocessedText);
+            });
+            document.getElementById('slow-play-btn').addEventListener('click', () => {
+               const frenchText = document.getElementById('french-text').textContent;
+                const preprocessedText = preprocessText(frenchText);
+                speak(preprocessedText,0.5);
+            });
+            document.getElementById('record-btn').addEventListener('click', () => {
+                if (mediaRecorder && mediaRecorder.state === "recording") {
+                    mediaRecorder.stop();
+                    document.getElementById('record-btn').textContent = '录音';
+                } else {
+                    if (stream) {
+                        mediaRecorder = new MediaRecorder(stream);
+                        mediaRecorder.start();
+                        mediaRecorder.addEventListener("dataavailable", event => {
+                            audioChunks.push(event.data);
+                        });
+                        mediaRecorder.addEventListener("stop", () => {
+                            const audioBlob = new Blob(audioChunks);
+                            const audioUrl = URL.createObjectURL(audioBlob);
+                            const audio = new Audio(audioUrl);
+                            audio.play();
+                            audioChunks = [];
+                        });
+                        document.getElementById('record-btn').textContent = '停止录音';
+                    } else {
+                        console.error("Microphone stream not available");
+                    }
+                }
+            });
+             document.getElementById('sentence-play-btn').addEventListener('click', () => {
+                  const sentenceText = document.getElementById('sentence-text').textContent;
+                  const preprocessedText = preprocessText(sentenceText);
+                  speak(preprocessedText);
+            });
+            document.getElementById('sentence-slow-play-btn').addEventListener('click', () => {
+                  const sentenceText = document.getElementById('sentence-text').textContent;
+                  const preprocessedText = preprocessText(sentenceText);
+                  speak(preprocessedText,0.5);
+            });
+            // Initial lo
+        });
+    </script>
+</body>
+</html>
+

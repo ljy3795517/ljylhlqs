@@ -1,12 +1,276 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <title>打开 PDF 文件</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Learning Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #E6F3FF;
+        }
+        nav {
+            background-color: #4180dd;
+            padding: 10px;
+            text-align: center;
+        }
+        .nav-button {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 0 5px;
+            background-color: #4180dd;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .top-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background-color: #FFFACD;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .enlarged-text {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-align: left; /* Modified this line */
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .control-button {
+            padding: 15px 20px;
+            margin: 0 5px;
+            font-size: 14px;
+            background-color: #90EE90;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #play-btn, #slow-play-btn, #record-btn {
+            background-color: #4180dd;
+            color: white;
+        }
+        .bottom-section {
+            flex: 2;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        tr.active {
+            background-color: #f0f0f0;
+        }
+        .select-btn, .toggle-btn {
+            padding: 5px 10px;
+            margin: 0 2px;
+            background-color: #4180dd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .toggle-btn {
+            background-color: #FFA07A;
+        }
+    </style>
 </head>
 <body>
-  <h1>点击链接打开1234. PDF 文件</h1>
-  <p>
-    <a href="tppdf/1234.pdf" target="_blank">打开 PDF 文件</a>
-  </p>
+    <nav>
+       <a href="index.html" class="nav-button" title="首页">🏠</a>
+        <a href="index1c.html" class="nav-button">1-学习网页</a>
+        <a href="" class="nav-button">2-</a>
+        <a href="" class="nav-button">3-</a>
+        <a href="" class="nav-button">4-</a>
+        <a href="" class="nav-button">5-</a>
+        <a href="" class="nav-button">6-</a>
+        <a href="" class="nav-button">7-</a>
+        <a href="" class="nav-button">8-</a>
+        <a href="" class="nav-button">9-</a>
+        <a href="" class="nav-button">10-</a>
+    </nav>
+
+    <div class="top-section">
+        <div class="enlarged-text">
+            <div id="french-text"></div>
+            <div id="phonetic-text"></div>
+            <div id="chinese-text"></div>
+			<div id="example-text"></div>
+        </div>
+        <div class="controls">
+            <button id="prev-btn" class="control-button">上一句</button>
+            <button id="next-btn" class="control-button">下一句</button>
+        </div>
+    </div>
+
+    <div class="bottom-section">
+        <table id="data-table">
+            <tr>
+                <th>French</th>
+                <th>Chinese</th>
+                <th>Phonetic</th>
+				<th>Example</th>
+                <th>选择</th>
+                <th>隐藏/显示</th>
+            </tr>
+        </table>
+    </div>
+    <script>
+        let data = [
+            ["这是一个基础学习法语单词", "重点是以简易字典的形式。背单词。", "点下一句按钮。可看此网页的使用说明", "单词取自最常用单词。共计1998个。  "],
+            ["此网页分三个部分", "菜单区。显示区。数据区", "包括七个触发按钮", "两个数据表格的按钮。选择按钮。隐藏/显示按钮。"],
+            ["七个触发按钮是", "上一句,单词读音,单词慢读,录音,句子读音,句子慢读,下一句", "实现单词。句子。读音。录音功能。  ", "实现将数据表格中的数据。导入显示区中。  "],
+            ["两个数据表格的按钮是", "选择按钮。隐藏/显示按钮。在数据表格中。每一行都存在的。", "选择按钮实现的功能是。选择从哪一行开始学习 ", "隐藏/显示按钮实现的功能是学哪些行。不学哪些行。可以选择。  "],
+			["选择按钮的作用", "可以实现随意从哪一个句子开始学习", "在数据表格的某一行。点击选择按钮。", "即从这一行开始学习。不一定每次都从第一行开始学习。  "],
+            ["具体表现为。", "当点击某一行的选择按钮时", "显示区显示,数据表格中的该行数据  ", " 即可以从这一行开始学习。 "],
+			["隐藏/显示按钮✔✘合一的图案符号的解释", "它可实现自我选择学习。", "只学隐藏/显示按钮是✔的句子  ", "不学隐藏/显示按钮是✘的句子  "],
+            ["隐藏/显示按钮是✔号,含义是这一行数据没有被隐含。", "点击此行选择按钮时。", "或通过点击。上一句按钮。下一句按钮。  ", "这一行数据可以在显示区显示。从而可以开始学习。  "],
+            ["隐藏/显示按钮是✘号,含义是这一行数据被隐含", "点击此行选择按钮时", "或通过点击。上一句按钮。下一句按钮。", "这一行数据将不在显示区显示,从而不能开始学习。  "],
+            ["第一行隐藏/显示符号有特殊用处", "点击第一行隐藏/显示符号时", "全体行都一起跟着变化", "全体行都一起跟着变化✘号  "],
+            ["第一行隐藏/显示符号已经点击", "全体行变✘,此时想要全体行变✔", "可以点击菜单栏里的刷新菜单。", " 或把光标留在网址处。按回车。让页面刷新 "],
+            ["除了第一行。点击其他行的隐藏/显示符号时", "此行的隐藏/显示符号变化", "原来是✔号变✘号 ", "原来是✘号变✔号  "],
+			["当点击上一句,下一句按钮时", "显示区显示", "数据表格中的相应数据", "从而可以开始学习显示区显示内容  "],
+            ["当点击单词读音按钮时", "显示区法语单词", "发出法语单词语音", "  "],
+            ["当点击单词慢读按钮时", "发出较慢法语单词语音", "有时发音等待时间较长。耐心等待", "  "],
+			["当点击录音按钮时", "可以录音。并显示停止录音按钮。", "录音结束后。要点击停止录音按钮。", "录完后可以听到自己刚录的声音  "],
+			["当点击句子读音按钮时", "显示区法语句子", "发出法语句子语音", "  "],
+            ["当点击句子慢读按钮时", "发出较慢法语句子语音", "有时发音等待时间较长。耐心等待", "  "],
+			["当点击菜单栏时", "会出现一个询问麦克风是否允许使用的窗口", "点击第一个框。授权使用。", "即点击 autoriser  "],
+            ["当点击菜单栏使用说明菜单时", "会出现使用说明页面", "可以查看整个网站如何使用", "详细操作步骤。"],
+            ["当显示区显示的数据不动。或出现异常时。", "可以点击菜单栏中的刷新菜单,排除故障。", " 在一个字母已经学完。更换学其他字母时。建议点一次刷新菜单。"],
+            ["此网站的学习。仿照词典分26部分。", "每部分都是该字母开头的单词。", " 可以通过点击菜单栏里的字母。"," 学习该字母开头的单词"],
+			["以上是网页操作说明", "欢迎大家使用。", "谢谢", "  "],
+            [" ", " ", " ", " "]
+        ];
+
+        let visibility = Array(data.length).fill(true);
+        let currentIndex = 0;
+        let synth = window.speechSynthesis;
+        let mediaRecorder;
+        let audioChunks = [];
+        let stream1;
+
+       let stream;
+
+/*
+// 在页面加载时请求麦克风权限并保持流开启
+navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(s => {
+        stream = s;
+        console.log("Microphone is now ready to use");
+        // 保持音频轨道开启
+        stream.getAudioTracks().forEach(track => {
+            track.enabled = true;
+        });
+    })
+    .catch(error => {
+        console.error("Error accessing microphone:", error);
+    });
+*/
+        function updateDisplay() {
+            if (visibility[currentIndex]) {
+                document.getElementById('french-text').textContent = data[currentIndex][0];
+                document.getElementById('chinese-text').textContent = data[currentIndex][2];
+                document.getElementById('phonetic-text').textContent = data[currentIndex][1];
+				document.getElementById('example-text').textContent = data[currentIndex][3];
+            } else {
+                navigateNextVisible(1);
+            }
+
+            const rows = document.querySelectorAll('#data-table tr');
+            rows.forEach((row, index) => {
+                if (index === currentIndex + 1) {
+                    row.classList.add('active');
+                } else {
+                    row.classList.remove('active');
+                }
+            });
+        }
+
+
+        function navigateNextVisible(direction) {
+            let startIndex = currentIndex;
+            do {
+                currentIndex += direction;
+                if (currentIndex < 0) currentIndex = data.length - 1;
+                if (currentIndex >= data.length) currentIndex = 0;
+            } while (!visibility[currentIndex] && currentIndex !== startIndex);
+            updateDisplay();
+        }
+
+        document.getElementById('prev-btn').addEventListener('click', () => navigateNextVisible(-1));
+        document.getElementById('next-btn').addEventListener('click', () => navigateNextVisible(1));
+
+
+
+        const tableBody = document.getElementById('data-table');
+        data.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            row.forEach(cell => {
+                const td = document.createElement('td');
+                td.textContent = cell;
+                tr.appendChild(td);
+            });
+            const selectTd = document.createElement('td');
+            const selectBtn = document.createElement('button');
+            selectBtn.textContent = '选择';
+            selectBtn.className = 'select-btn';
+            selectBtn.addEventListener('click', () => {
+                if (visibility[index]) {
+                    currentIndex = index;
+                    updateDisplay();
+                } else {
+                    navigateNextVisible(1);
+                }
+            });
+            selectTd.appendChild(selectBtn);
+            tr.appendChild(selectTd);
+
+            const toggleTd = document.createElement('td');
+            const toggleBtn = document.createElement('button');
+            toggleBtn.textContent = '✔';
+            toggleBtn.className = 'toggle-btn';
+            toggleBtn.addEventListener('click', () => {
+                if (index === 0) {
+                    visibility.fill(false);
+                    document.querySelectorAll('.toggle-btn').forEach(btn => btn.textContent = '✘');
+                } else {
+                    visibility[index] = !visibility[index];
+                    toggleBtn.textContent = visibility[index] ? '✔' : '✘';
+                }
+            });
+            toggleTd.appendChild(toggleBtn);
+            tr.appendChild(toggleTd);
+
+            tableBody.appendChild(tr);
+        });
+
+        updateDisplay();
+    </script>
 </body>
 </html>
